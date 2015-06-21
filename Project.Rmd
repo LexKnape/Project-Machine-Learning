@@ -1,0 +1,217 @@
+## **"Predict the manner in which they did the exercise."**
+
+Author: "Lex Knape"
+Date: Thursday 18 june 2015
+Software: OSX Yosemite 10.10.3, RStudio Version 0.98.1091
+job: Manager data Science Renault
+subtitle: Course project part of Lesson 8 Machine learning.
+Hardware: MacBook Pro, processor 2.4 GHz Intel dual-Core i5, Memory 8 GB 1067 MHz DDR3
+
+## **Project description**
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement ??? a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+The six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).
+
+Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes. Participants were supervised by an experienced weight lifter to make sure the execution complied to the manner they were supposed to simulate. The exercises were performed by six male participants aged between 20-28 years, with little weight lifting experience. We made sure that all participants could easily simulate the mistakes in a safe and controlled manner by using a relatively light dumbbell (1.25kg).
+
+Read more: http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises#ixzz3daLcHeIXRead more: http://groupware.les.inf.puc-rio.br/har#weight_lifting_exercises#ixzz3daLEUeWZ### **Data**
+The training data for this project are available here: 
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here: 
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+### **What you should submit**
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing 
+1. how you built your model, 
+2. how you used cross validation, 
+3. what you think the expected out of sample error is, 
+4. why you made the choices you did. 
+5. you will also use your prediction model to predict 20 different test cases. 
+
+1. Your submission should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
+
+2. You should also apply your machine learning algorithm to the 20 test cases available in the test data above. Please submit your predictions in appropriate format to the programming assignment for automated grading. See the programming assignment for additional details. 
+
+--------
+### **How you built your model**
+Our outcome variable is classe, a factor variable. For this data set, 6 participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in 5 different fashions: - exactly according to the specification (Class A) - throwing the elbows to the front (Class B) - lifting the dumbbell only halfway (Class C) - lowering the dumbbell only halfway (Class D) - throwing the hips to the front (Class E)
+
+After setting the workdirectory, I installed the packages and loaded the libraries. I downloaded the data and created both training and test set. In order to get a feel of the dataset I explored the data via the str (to many variables to use the summary function) and also via the dim, View , head and tail function.
+
+After exploring the data I recognized that the data has been drawn under highly controlled conditions. This explains the low percentage of segregated training data. I cleaned the data from variables containing only NA's and variables with values near Zero. I also removed variables with no added value to the predictions like timestamps etc. 
+
+I then split the Trainingset into a dataset for building the model and into a set for cross validation. As a  rule of thumb for prediction study design for medium sample sizes I split the Trainingset in 60% training and 40% testing.
+
+I built the various models using the train function of the Caret package. I choosed Two models will be tested using decision tree and random forest. The model with the highest accuracy will be chosen as our final model. In the sections How I used cross validation aI added also info about how you built my model
+
+### **How I used cross validation**
+Cross-validation, sometimes called rotation estimation, is a model validation technique for assessing how the results of a statistical analysis will generalize to an independent data set. With cross validation I want to estimate how accurately a predictive model will perform in practice. In this project a model is given a training dataset on which training is run, and a dataset against which the model is tested, the testing dataset. Thus the goal of cross validation is to define a dataset to "test" the model in the training phase (i.e., the validation dataset), in order to limit problems like overfitting, give an insight on how the model will generalize to an independent dataset. The rules of thumb for prediction study design for medium sample size is split the Trainingset in 60% training and 40% testing which is what I have done. 
+
+One round of cross-validation involves partitioning a sample of data into complementary subsets, performing the analysis on one subset (called the training set), and validating the analysis on the other subset (called the validation set or testing set). To reduce variability, multiple rounds of cross-validation are performed using different partitions, and the validation results are averaged over the rounds.
+
+I therefor used TrainControl as it can perform multifold (7) cross validation. From te trainoptions I choose trainControl, it gives more options and flexibility. The elements I choose in the traincontrol function are, the method (cv = cross validation) and number ( 7 ) of resampling,  verboseIter that is the logical for printing the training log and the preProcOptions that is a list of options to pass to preProcess. The type of pre-processing (e.g. center, scaling etc) is passed in via the preProcOptions. I used PCA pre processing were the principal components are equal to the right singular values if I first scale (substract the mean, divide by the standard deviation) the variables. 
+
+### **The expected out of sample error.**
+The In sample error is the error rate I get on the data set I used to build the predictor. The out of sample of error is the error rate I got on the new data set. I expect that the In sample error < out of sample error and the reason why is overfitting. I estimate that the out of sample error is around 95%. 
+
+### **why you made the choices you did.**
+As I do a lot of programming in my work I never build a machine learning model so I followed the instructions from the lecture and discussion forum in order not to loose too much time and stick to basics to get the results in time. FYI a lost two days due to having the used the trainingset for both training and final testset. I choose the 60% trainingset as I dealt with a medium set and did the NearZeroVar, NA cleanup and removed the first variables as they had no added value. I still find it difficult which model I must choose and is defintely a focus for the near future. I therefor sticked to the decision tree and Random forest well known to have the best results in machine learning and it worked. 
+
+## **Conclusion**
+I found it very interesting to go through a serious Machine learning example and saw the general steps necessary to create training and testset, choose a model and see by the outcome which one is the best and apply the model on the test ste to predict the classe. I choose the Random Forest model as it showed the best accuracy and the results of the predicted showed an ultimate score with congratulations on all 20 cases. 
+
+### **Loading and preprocessing the data**
+I always start with setting the working directory and I checked if it existed.  
+
+```{r}
+setwd("/Users/anknape/Mainfolder/Study/Coursera/Data Science/Les 8 Machine Learning")
+getwd()
+```
+
+I installed the required packages and load the libraries
+
+```{r}
+install.packages("caret")
+install.packages("randomForest")
+install.packages("ggplot2")
+install.packages("lattice")
+
+library(caret)
+library(randomForest)
+library(ggplot2)
+library(lattice)
+
+```
+
+I set.seed as I want reproducible results. 
+```{r}
+set.seed(12345)
+```
+
+I set variables for the Trainurl and Testurl
+```{r}
+Trainurl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+Testurl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+```
+
+The data is downloaded and to the working directory and is set in vectors trainingset and testset
+```{r}
+download.file(Trainurl,"pml-training.csv")
+trainingset <- read.csv("pml-training.csv", na.strings=c("NA","#DIV/0!", ""))
+download.file(Testurl,"pml-testing.csv")
+testset <- read.csv("pml-testing.csv", na.strings=c("NA","#DIV/0!", ""))
+```
+
+I performed some exploratory analysis with dim, View, str, head and tail 
+```{r}
+dim(trainingset)
+View(trainingset)
+str(trainingset)
+head(trainingset)
+tail(trainingset)
+```
+
+I checked the influence of the NA's on the trainingset via the table function.
+```{r}
+table(is.na(trainingset))
+```
+
+I checked which variables had value near zero and could be removed as the influence as predictor is near zero.
+```{r}
+TrainingNSV <- nearZeroVar(trainingset,saveMetrics=TRUE)
+TrainingNSV
+TestNSV <- nearZeroVar(testset,saveMetrics=TRUE)
+TestNSV
+```
+
+I removed the variables indicated by the TrainingNSV and TestNSV
+```{r}
+trainingset <- trainingset[,-nearZeroVar(trainingset)]
+testset <- testset[,-nearZeroVar(testset)]
+names(trainingset)
+```
+
+I removed the variables with only NA as they have no value as predictor and checked the vectors after the cleaning with the exploitory functions; View and str 
+```{r}
+trainingset <- trainingset[,colSums(is.na(trainingset)) == 0]
+testset <- testset[,colSums(is.na(testset)) == 0]
+
+View(trainingset)
+str(trainingset)
+```
+
+I then removed the first variables six as they didn't have any added value oas predictors. These are: user_name, raw_timestamp_part_1, raw_timestamp_part_,2 cvtd_timestamp, new_window, and  num_window (columns 1 to 6). 
+```{r}
+trainingset   <-trainingset[,-c(1:6)]
+testset   <-testset[,-c(1:6)]
+```
+
+The rules of thumb for prediction study design for medium sample size is split the Trainingset in 60% training and 40% testing. 
+```{r}
+Trainset <- createDataPartition(y=trainingset$classe, p=0.6, list=FALSE)
+TrainSet <- trainingset[Trainset, ]
+TestSet <- trainingset[-Trainset, ]
+```
+
+I plotted the trainingset to see the different levels and frequency of the classe.
+```{r}
+plot(TrainSet$classe, col="red", main="The various classe levels in the trainingset", xlab="classe", ylab="Frequency")
+```
+
+I included in the extra options in train function instead of using the standard train function as described above.
+```{r}
+tc <- trainControl(method = "cv", number = 7, verboseIter=FALSE , preProcOptions="pca", allowParallel=TRUE)
+tc
+```
+
+I selected two models 1. The Decision tree and the 2. Random forect model. First I build the Ctree model, did a prediction on the testset and got the results via the confusionmatrix. I used the traincontrol in the trainingset.
+```{r}
+ModelFitDT <- train(classe ~ ., data = TrainSet, method = "ctree", trControl = tc)
+ModelFitDT
+prediction1 <- predict(ModelFitDT, newdata = TestSet)
+confusionMatrix(prediction1, TestSet$classe)
+```
+
+I did the same for the RandomForest model
+```{r}
+ModelFitRF <- train(classe ~ ., data = TrainSet, method = "rf", trControl = tc)
+ModelFitRF
+prediction2 <- predict(ModelFitRF, newdata = TestSet)
+confusionMatrix(prediction2, TestSet$classe)
+```
+
+Plot the Random Forest tree
+```{r}
+plot(ModelFitDT$finalModel)
+text(ModelFitDT$finalModel)
+```
+
+The results of the two models showed that the Random Forest is a better model than the Decision tree. Random Forest showed an Accuracy of 0.9924, 95% CI : (0.9902, 0.9942) against Accuracy : 0.8933,95% CI : (0.8863, 0.9001) for the decision tree. The out of sample error is 0.5%  
+
+As we choose the Random Forest model as the best we know will use this prediction model to predict 20 different test cases. 
+
+1. First we will create a vector PredictFinal by using the prediction model on the testset and predict the outcome levels. 
+```{r}
+PredictFinal <- predict(ModelFitRF, testset)
+PredictFinal
+```
+
+I will use the function as given in the Course Project: Submission and add the vector PredictFinal. a print shows the outcome.
+```{r} 
+pml_write_files = function(x){
+        n = length(x)
+        for(i in 1:20){
+                filename = paste0("problem_id_",i,".txt")
+                write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+        }
+}
+
+pml_write_files(PredictFinal)
+print(PredictFinal)
+```
+
+## **Conclusion**
+I found it very interesting to go through a serious Machine learning example and saw the general steps necessary to create training and testset, choose a model and see by the outcome which one is the best and apply the model on the test ste to predict the classe. I choose the Random Forest model as it showed the best accuracy and the results of the predicted showed an ultimate score with congratulations on all 20 cases. 
